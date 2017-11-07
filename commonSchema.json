@@ -1,0 +1,88 @@
+{
+	"swagger": "2.0",
+	"info": {
+		"title": "Title",
+		"description": "Description",
+		"version": "Version number"
+	},
+	"host":"Host name",
+	"schemes":[
+		"https"
+	],
+	"basePath": "api/sg/v2",
+	"produces": [
+		"application/json"
+	],
+	"securityDefinitions": {
+		"accessToken": {
+			"description": "Access token description",
+			"type": "oauth2",
+			"authorizationUrl": "Authorisation URL",
+			"tokenUrl": "Token URL",
+			"flow": "accessCode",
+			"scopes": {
+				"Scope of access": "Description of scope"
+			}
+		}
+	},
+	"paths": {
+		"apiName":{
+			"apiMethod":{
+				"summary": "Summary of API method",
+				"description": "Description of API method",
+				"parameters":[
+					{
+                          "name":"clientId",
+                          "in":"header",
+                          "description":"Client Identifier",
+                          "required":true,
+                          "type":"string"
+                      },
+                      {
+                          "name":"accessToken",
+                          "in":"header",
+                          "description":"Access token",
+                          "required":true,
+                          "type":"string"
+                      },
+					   {
+						"name": "accept-version",
+						"in": "header",
+						"description": "Specifies the acceptable version of the message set. Example: 1.2",
+						"required": false,
+						"type": "string"
+						},
+                      {
+                          "name":"body",
+                          "in":"body",
+                          "description":"Description of request",
+                          "required":true,
+                          "schema":{
+							"$ref":"Schema of request"
+							}
+						}
+				],
+				"response":{
+					 "201":{
+                          "description":"Creation success",
+                          "schema":{
+							"$ref":"Schema of response"
+						  }
+                      },
+                      "403":{
+                          "description":"Forbidden"
+                      },
+                      "404":{
+                          "description":"Not Found"
+                      },
+                      "500":{
+                          "description":"Internal Server Error",
+                          "schema":{
+                              "$ref":"Schema of server error"
+                          }
+                      }
+					}
+				}
+			}
+		}	
+	}
