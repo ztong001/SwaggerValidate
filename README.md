@@ -11,6 +11,7 @@ Instructions **Updated**
 
 Changelog(v1.2)
 
+- Script does not break when parsing an invalid json file
 - Folder selection dialog to select your directory, no need to fill in full classpath now.
 - Allows the choice of running modify script after the validate script finishes.
 - Added in additional checks (hostname,schemes,error 201)
