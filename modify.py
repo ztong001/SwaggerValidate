@@ -1,3 +1,5 @@
+#!/usr/bin/python
+# -*- coding: utf-8 -*-
 """Python script to MODIFY swagger docs to its correct format"""
 import argparse
 import collections
@@ -9,6 +11,11 @@ import sys
 parser= argparse.ArgumentParser()
 parser.add_argument("directory", help="Full directory path of swagger docs",type=str)
 input_dir= parser.parse_args().directory
+
+overview_headers=["Overview","Version History","Authentication","<security-definitions>","Pagination","Frequently Asked Question","Known Issues","Throttling"]
+def check_overview(headers,description):
+	missing=[i for i in headers if i not in description]
+	return missing
 
 def replace_at_index(tup, ix, val): 
 	return tup[:ix] + (val,) + tup[ix+1:]
@@ -25,6 +32,9 @@ def modify(input):
 	if "# Overview" not in description:
 		print("{}: Overview sections added, please check".format(title))
 		new_description="# Overview\n {} \n\n# Version History\nVersion | Release date | Link to documentation\n--------|--------------|----------------------\nv1      | July, 2017   | (this page)\n\n# Authentication\n <!-- ReDoc-Inject: <security-definitions> --> \n\n# Pagination\nPagination is not available on this API.\n\n# Frequently Asked Question\nQ1: What is the accessToken to be used in the API headers?\n\nAns: The accessToken should be the Partner's token and not the Customer's accessToken.\n\n# Known Issues\nThis API has no pending issues at the moment. Want to report a new issue? please help us **here**\n\n# Throttling (Rate Limits)\nWe throttle our APIs by default to ensure maximum performance for all developers.\n\nBelow is more details to control API rate limits\n".format(description,title)
+	headers_missing=check_overview(overview_headers,description)
+	elif len(headers_missing) != 0:
+		print("Sections missing: "+", ".join(headers_missing))
 		input["info"]["description"]= new_description
 	if input.get("schemes") == None or "https" not in input.get("schemes"):
 		input["schemes"]=["https"]
@@ -65,6 +75,11 @@ def modify(input):
 				print("Method {}/{}: Replaced 'get' with 'Retrieve'".format(k,api_method))
 			param_list = [d['name'] for d in api.get("parameters")]
 			parameters = api.get("parameters")
+			## Check if parameter has in:"path", if yes its required: True
+			for item in parameters:
+				if item.get("in")=="path" and item.get("required")=="false":
+					item["required"]="true"
+					print("Method {}/{} : Path parameter corrected".format(k,api_method))
 			## Check accept-version header and description
 			if "accept" in param_list:
 				del api["parameters"]["accept"]
@@ -146,7 +161,7 @@ def check_directory(dir):
 				dir_contents.append([filename,file_contents])
 	except Exception as e:
 		print("{} is not a valid JSON file".format(filename))
-		print('Error on line {}'.format(sys.exc_info()[-1].tb_lineno), type(e).__name__, e)
+		print('Error on line {} \n'.format(sys.exc_info()[-1].tb_lineno), type(e).__name__, e)
 	return dir_contents
 		
 def main():

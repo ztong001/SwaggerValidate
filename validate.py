@@ -65,7 +65,7 @@ def validate(input):
 			parameters = api.get("parameters")
 			## Check if parameter has in:"path", if yes its required: True
 			for item in parameters:
-				if item.get("in")=="path" and item.get("required")=="false":
+				if item.get("in")=="path" and item.get("required")==False:
 					errorLog(k,"path",api_method)
 			## Check accept-version header and description
 			if "accept-version" in param_list:
