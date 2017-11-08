@@ -12,7 +12,7 @@ parser.add_argument("directory", help="Full directory path of swagger docs",type
 input_dir= parser.parse_args().directory
 
 ## List of all Error messages
-errorMessages= {"scheme_empty":"Schemes must be defined","scheme":"Schemes should be https","host":"Hostname should be www.dbs.com/sandbox", "overview":"swagger description should have the words 'Overview', 'Version History', 'Authentication', '<security-definitions>', 'Pagination', 'FAQ', 'Known Issues' and 'Throttling'","securityDefinitions":"Security definitions not found.","summary":"Summary needs to be capitalized.","get":"Replace 'get' with 'Retrieve'.","accept":"Change description to 'Specifies the acceptable version of the message set. If not specified, the latest version of the API will be considered. Example: 1.2'","no-accept":"No accept-version found.","uuid":"No uuid found.","default":"Default error responses needs to be removed","no-e500":"Error 500 not present","e500":"Error 500 needs a schema defined.","201":"Error 201 is only for POST methods"}
+errorMessages= {"scheme_empty":"Schemes must be defined","scheme":"Schemes should be https","host":"Hostname should be www.dbs.com/sandbox", "overview":"swagger description should have the words 'Overview', 'Version History', 'Authentication', '<security-definitions>', 'Pagination', 'FAQ', 'Known Issues' and 'Throttling'","securityDefinitions":"Security definitions not found.","summary":"Summary needs to be capitalized.","get":"Replace 'get' with 'Retrieve'.","accept":"Change description to 'Specifies the acceptable version of the message set. If not specified, the latest version of the API will be considered. Example: 1.2'","no-accept":"No accept-version found.","uuid":"No uuid found.","default":"Default error responses needs to be removed","no-e500":"Error 500 not present","e500":"Error 500 needs a schema defined.","201":"Error 201 is only for POST methods","path":"Parameter with path must be required."}
 overview_headers=["Overview","Version History","Authentication","<security-definitions>","Pagination","Frequently Asked Question","Known Issues","Throttling"]
 def check_overview(headers,description):
 	missing=[i for i in headers if i not in description]
@@ -63,6 +63,10 @@ def validate(input):
 				errorLog(k,"get",api_method)
 			param_list = [d['name'] for d in api.get("parameters")]
 			parameters = api.get("parameters")
+			## Check if parameter has in:"path", if yes its required: True
+			for item in parameters:
+				if item.get("in")=="path" and item.get("required")=="false":
+					errorLog(k,"path",api_method)
 			## Check accept-version header and description
 			if "accept-version" in param_list:
 				for item in parameters:
@@ -108,7 +112,7 @@ def check_directory(dir):
 				file_contents=fileopen(filename)
 				dir_contents.append(file_contents)
 		except Exception as e:
-			print("{} is not a valid JSON file".format(filename))
+			print("{} is not a valid JSON file \n".format(filename))
 			print('Error on line {}\n\n'.format(sys.exc_info()[-1].tb_lineno), type(e).__name__, e)
 			continue
 	return dir_contents
